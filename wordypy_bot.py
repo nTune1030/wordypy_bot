@@ -1,3 +1,4 @@
+# TODO: Implement the Letter and Bot classes in this file
 # Create the implementation of the Letter class here
 
 
@@ -31,6 +32,7 @@ assert hasattr(
 
 # CELL
 
+# TODO: Implement the Bot class in this file
 # Create the implementation of the Bot class here
 
 # YOUR CODE HERE
