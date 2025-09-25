@@ -3,6 +3,8 @@
 
 
 # YOUR CODE HERE
+import random
+
 class Letter:
     '''A class representing a letter in a word game.
     
@@ -83,14 +85,44 @@ class Bot:
         guess = random.choice(self.possible_words)
         return guess
 
-    def record_guess_results(self, guess: str, guess_results: list[Letter]) -> None:
-        """Records the results of a guess to refine future guesses.
+    def record_guess_results(self, guess: str, guess_results: list['Letter']) -> None:
+        """Records the results of a guess to refine future guesses."""
         
-        Args:
-            guess: The word that was guessed.
-            guess_results: A list of Letter objects representing the results of the guess.
-        """
-        # TODO: Implement logic to refine future guesses based on guess_results
+        # Start with an empty list for the words that pass all the tests
+        new_possible_words = []
+
+        # Loop through every word that is currently considered possible
+        for word in self.possible_words:
+            is_still_possible = True # Assume the word is valid until proven otherwise
+
+            # Check this word against every piece of feedback from the last guess
+            for i, letter_feedback in enumerate(guess_results):
+                letter_char = letter_feedback.letter
+                
+                # Rule 1: Green letters (correct place)
+                if letter_feedback.is_in_correct_place:
+                    if word[i] != letter_char:
+                        is_still_possible = False
+                        break # This word is invalid, no need to check other letters
+
+                # Rule 2: Yellow letters (in word, wrong place)
+                elif letter_feedback.is_in_word:
+                    if letter_char not in word or word[i] == letter_char:
+                        is_still_possible = False
+                        break # Word must contain the letter, but not here
+
+                # Rule 3: Grey letters (not in word)
+                else:
+                    if letter_char in word:
+                        is_still_possible = False
+                        break # Word cannot contain this letter at all
+
+            # If the word passed all the checks, add it to our new list
+            if is_still_possible:
+                new_possible_words.append(word)
+        
+        # Replace the old list with the newly filtered, smaller list
+        self.possible_words = new_possible_words
 
 # raise NotImplementedError()
 
