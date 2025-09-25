@@ -7,23 +7,28 @@ class Letter:
     '''A class representing a letter in a word game.
     
     Attributes:
-        letter (str): The character representing the letter.
-        correct_place (bool): Indicates if the letter is in the correct position.
-        in_word (bool): Indicates if the letter is in the target word.
+        letter: The character itself (e.g., 'a', 'b', 'c').
+        is_in_word: A boolean indicating if the letter is in the target word.
+        is_in_correct_place: A boolean indicating if the letter is in the correct position.
     '''
 
     def __init__(self, letter: str) -> None:
-        """Initialize a Letter instance."""
-        pass
+        """Initializes the Letter object.
+        
+        The status flags start as False because we don't know the
+        letter's status until the GameEngine provides feedback.
+        
+        Args:
+            letter: The character for this letter object.
+        """
+        self.letter: str = letter
+        self.in_word: bool = False
+        self.in_correct_place: bool = False
 
-    def is_in_correct_place(self) -> bool:
-        """Check if the letter is in the correct position."""
-        pass
-
-    def is_in_word(self) -> bool:
-        """Check if the letter is in the target word."""
-        pass
-
+    def __repr__(self) -> str:
+        """Developer-friendly representation of the Letter for debugging purposes."""
+        return f"Letter('{self.letter}', in_word={self.is_in_word}, in_correct_place={self.is_in_correct_place})"
+    
 # raise NotImplementedError()
 
 # CELL
@@ -57,7 +62,34 @@ assert hasattr(
 # Create the implementation of the Bot class here
 
 # YOUR CODE HERE
-raise NotImplementedError()
+class Bot:
+    def __init__(self, word_list_file: str) -> None:
+        """Initializes the Bot with a list of possible words.
+        
+        Args:
+            word_list_file: Path to a text file containing valid words, one per line.
+        """
+        self.word_list_file = word_list_file
+
+    def make_guess(self) -> str:
+        """Makes a guess from the list of possible words.
+        
+        Returns:
+            A string representing the guessed word.
+        """
+        # TODO: Implement logic to select a word from the word list
+        return "doggy"
+
+    def record_guess_results(self, guess: str, guess_results: list[Letter]) -> None:
+        """Records the results of a guess to refine future guesses.
+        
+        Args:
+            guess: The word that was guessed.
+            guess_results: A list of Letter objects representing the results of the guess.
+        """
+        # TODO: Implement logic to refine future guesses based on guess_results
+
+# raise NotImplementedError()
 
 #CELL
 
