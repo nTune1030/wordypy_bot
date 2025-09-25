@@ -6,30 +6,27 @@
 import random
 
 class Letter:
-    '''A class representing a letter in a word game.
-    
-    Attributes:
-        letter: The character itself (e.g., 'a', 'b', 'c').
-        is_in_word: A boolean indicating if the letter is in the target word.
-        is_in_correct_place: A boolean indicating if the letter is in the correct position.
-    '''
+    '''A class representing a letter in a word game.'''
 
     def __init__(self, letter: str) -> None:
-        """Initializes the Letter object.
-        
-        The status flags start as False because we don't know the
-        letter's status until the GameEngine provides feedback.
-        
-        Args:
-            letter: The character for this letter object.
-        """
+        """Initializes the Letter object."""
         self.letter: str = letter
+        # These attribute names must match the tests EXACTLY
         self.in_word: bool = False
         self.in_correct_place: bool = False
 
     def __repr__(self) -> str:
-        """Developer-friendly representation of the Letter for debugging purposes."""
-        return f"Letter('{self.letter}', in_word={self.is_in_word}, in_correct_place={self.is_in_correct_place})"
+        """Developer-friendly representation for debugging."""
+        # This should also use the correct attribute names
+        return f"Letter('{self.letter}', in_word={self.in_word}, in_correct_place={self.in_correct_place})"
+    
+    def is_in_word(self) -> bool:
+        """Returns True if the letter is in the word (for the GameEngine)."""
+        return self.in_word
+
+    def is_in_correct_place(self) -> bool:
+        """Returns True if the letter is in the correct place (for the GameEngine)."""
+        return self.in_correct_place
     
 # raise NotImplementedError()
 
@@ -66,63 +63,46 @@ assert hasattr(
 # YOUR CODE HERE
 class Bot:
     def __init__(self, word_list_file: str) -> None:
-        """Initializes the Bot with a list of possible words.
-        
-        Args:
-            word_list_file: Path to a text file containing valid words, one per line.
-        """
-        self.possible_words = []
+        """Initializes the Bot with a list of possible words."""
+        self.word_list = []
         with open(word_list_file, 'r') as file:
             for word in file:
-                self.possible_words.append(word.strip())
+                self.word_list.append(word.strip().upper())
 
     def make_guess(self) -> str:
-        """Makes a random guess from the list of possible words.
-        
-        Returns:
-            A string representing the guessed word.
-        """
-        guess = random.choice(self.possible_words)
+        """Makes a random guess from the list of possible words."""
+        guess = random.choice(self.word_list)
         return guess
 
     def record_guess_results(self, guess: str, guess_results: list['Letter']) -> None:
         """Records the results of a guess to refine future guesses."""
+        self.word_list.remove(guess)
         
-        # Start with an empty list for the words that pass all the tests
         new_possible_words = []
 
-        # Loop through every word that is currently considered possible
-        for word in self.possible_words:
-            is_still_possible = True # Assume the word is valid until proven otherwise
+        for word in self.word_list:
+            is_still_possible = True
 
-            # Check this word against every piece of feedback from the last guess
             for i, letter_feedback in enumerate(guess_results):
                 letter_char = letter_feedback.letter
                 
-                # Rule 1: Green letters (correct place)
-                if letter_feedback.is_in_correct_place:
+                if letter_feedback.is_in_correct_place():
                     if word[i] != letter_char:
                         is_still_possible = False
-                        break # This word is invalid, no need to check other letters
-
-                # Rule 2: Yellow letters (in word, wrong place)
-                elif letter_feedback.is_in_word:
+                        break
+                elif letter_feedback.is_in_word():
                     if letter_char not in word or word[i] == letter_char:
                         is_still_possible = False
-                        break # Word must contain the letter, but not here
-
-                # Rule 3: Grey letters (not in word)
+                        break
                 else:
                     if letter_char in word:
                         is_still_possible = False
-                        break # Word cannot contain this letter at all
+                        break
 
-            # If the word passed all the checks, add it to our new list
             if is_still_possible:
                 new_possible_words.append(word)
         
-        # Replace the old list with the newly filtered, smaller list
-        self.possible_words = new_possible_words
+        self.word_list = new_possible_words
 
 # raise NotImplementedError()
 
