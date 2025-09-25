@@ -3,9 +3,30 @@
 
 
 # YOUR CODE HERE
-raise NotImplementedError()
+class Letter:
+    '''A class representing a letter in a word game.
+    
+    Attributes:
+        letter (str): The character representing the letter.
+        correct_place (bool): Indicates if the letter is in the correct position.
+        in_word (bool): Indicates if the letter is in the target word.
+    '''
 
-#CELL
+    def __init__(self, letter: str) -> None:
+        """Initialize a Letter instance."""
+        pass
+
+    def is_in_correct_place(self) -> bool:
+        """Check if the letter is in the correct position."""
+        pass
+
+    def is_in_word(self) -> bool:
+        """Check if the letter is in the target word."""
+        pass
+
+# raise NotImplementedError()
+
+# CELL
 
 # This cell has the tests your Letter class should pass in order to
 # be evaluated as correct. Some of the tests you can see here and
