@@ -69,16 +69,19 @@ class Bot:
         Args:
             word_list_file: Path to a text file containing valid words, one per line.
         """
-        self.word_list_file = word_list_file
+        self.possible_words = []
+        with open(word_list_file, 'r') as file:
+            for word in file:
+                self.possible_words.append(word.strip())
 
     def make_guess(self) -> str:
-        """Makes a guess from the list of possible words.
+        """Makes a random guess from the list of possible words.
         
         Returns:
             A string representing the guessed word.
         """
-        # TODO: Implement logic to select a word from the word list
-        return "doggy"
+        guess = random.choice(self.possible_words)
+        return guess
 
     def record_guess_results(self, guess: str, guess_results: list[Letter]) -> None:
         """Records the results of a guess to refine future guesses.
