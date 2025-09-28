@@ -1,121 +1,167 @@
-# TODO: Implement the Letter and Bot classes in this file
-# Create the implementation of the Letter class here
+#!/usr/bin/env python3
+"""
+WordyPy Game: An AI bot that plays a Wordle-like game.
 
+This script contains the classes to run a game of WordyPy, where an AI `Bot`
+attempts to guess a secret five-letter word. The `GameEngine` provides
+feedback for each guess as a list of `Letter` objects, which the `Bot` uses
+to make smarter guesses in subsequent rounds.
 
-# YOUR CODE HERE
+Classes:
+    Letter: Represents a single letter in a guess and its feedback status.
+    Bot: The AI agent that filters a word list and makes guesses.
+    GameEngine: Controls the game flow and evaluates the bot's guesses.
+"""
+
 import random
 
+
+
 class Letter:
-    '''A class representing a letter in a word game.'''
+    """Represents a single letter from a guess and its feedback status. 
+
+    This class acts as a data structure to hold a single character from a guess
+    and the results of that guess (e.g., if it's in the word, if it's in the
+    correct position). [cite: 2]
+
+    Attributes:
+        letter (str): The character itself (e.g., 'A').
+        in_word (bool): True if the letter is in the target word.
+        in_correct_place (bool): True if the letter is in the correct position.
+    """
 
     def __init__(self, letter: str) -> None:
-        """Initializes the Letter object."""
+        """Initializes the Letter object with a character. 
+        
+        This is the constructor. When you create a Letter object, you give it a 
+        character (e.g., 'A'), which it stores. The feedback attributes, in_word 
+        and in_correct_place, are initialized to False because their true status 
+        is unknown until the GameEngine evaluates them. 
+        """
         self.letter: str = letter
-        # These attribute names must match the tests EXACTLY
+        
+        # The status flags start as False because the feedback for this letter
+        # is unknown until the GameEngine evaluates it.
         self.in_word: bool = False
         self.in_correct_place: bool = False
 
     def __repr__(self) -> str:
-        """Developer-friendly representation for debugging."""
-        # This should also use the correct attribute names
+        """Provides a developer-friendly string representation for debugging."""
         return f"Letter('{self.letter}', in_word={self.in_word}, in_correct_place={self.in_correct_place})"
     
+    """is_in_word(self) and is_in_correct_place(self): 
+           These are simple "getter" methods. 
+           They don't change anything; they just return the current boolean value of their 
+           corresponding attribute. The GameEngine uses these methods to check the feedback 
+           for each letter.
+    """
     def is_in_word(self) -> bool:
-        """Returns True if the letter is in the word (for the GameEngine)."""
+        """Returns the status of the in_word flag."""
         return self.in_word
 
     def is_in_correct_place(self) -> bool:
-        """Returns True if the letter is in the correct place (for the GameEngine)."""
+        """Returns the status of the in_correct_place flag."""
         return self.in_correct_place
-    
-# raise NotImplementedError()
 
-# CELL
 
-# This cell has the tests your Letter class should pass in order to
-# be evaluated as correct. Some of the tests you can see here and
-# try on your own (press the button labeled validate on the toolbar).
-# Others are hidden from your view, and will be evaluated only when
-# you submit to the autograder.
-
-# Check if the Letter class exists
-assert "Letter" in dir(), "The Letter class does not exist, did you define it?"
-
-# Check to see if the Letter class can be created
-l: Letter
-try:
-    l = Letter("s")
-except:
-    assert (
-        False
-    ), "Unable to create a Letter object with Letter('s'), did you correctly define the Letter class?"
-
-# Check to see if the Letter class has the in_correct_place attribute
-assert hasattr(
-    l, "in_correct_place"
-), "The letter object created has no in_correct_place attribute, but this should be False by default. Did you create this attribute?"
-
-# CELL
-
-# TODO: Implement the Bot class in this file
-# Create the implementation of the Bot class here
-
-# YOUR CODE HERE
 class Bot:
+    """The AI agent that filters a word list and makes guesses."""
+
     def __init__(self, word_list_file: str) -> None:
-        """Initializes the Bot with a list of possible words."""
-        self.word_list = []
+        """Initializes the Bot with a list of possible words.
+
+        This constructor reads a specified text file, cleans up each word
+        (by removing whitespace and converting to uppercase), and stores
+        the resulting words in a list for the bot to use.
+
+        Args:
+            word_list_file (str): The path to a text file containing
+                                  valid words, one per line.
+        """
+        # This list will hold all words the bot considers possible answers.
+        # It is filtered down after each guess.
+        self.word_list: list[str] = []
+        
+        # 'with open(...)' ensures the file is closed automatically after reading.
         with open(word_list_file, 'r') as file:
             for word in file:
+                # .strip() removes whitespace/newlines and .upper() ensures
+                # all words are uppercase to match the GameEngine's format.
                 self.word_list.append(word.strip().upper())
 
+
     def make_guess(self) -> str:
-        """Makes a random guess from the list of possible words."""
+        """Selects and returns a single word from the current list of possibilities.
+
+        This method is called by the GameEngine at the start of each turn. As the
+        word_list is filtered down by the record_guess_results method, the
+        random choice made here becomes progressively more strategic.
+        
+        Returns:
+            str: The bot's next guess.
+        """
+        # Use the random.choice() function to pick one word from the list
+        # of words the bot currently thinks are possible.
         guess = random.choice(self.word_list)
         return guess
 
-    def record_guess_results(self, guess: str, guess_results: list['Letter']) -> None:
-        """Records the results of a guess to refine future guesses."""
-        self.word_list.remove(guess)
+
+    def record_guess_results(self, guess: str, guess_results: list[Letter]) -> None:
+        """Filters the bot's word list based on guess feedback.
+
+        This method is the core logic of the bot. It iterates through its
+        list of possible words, eliminating any word that violates the rules
+        learned from the feedback provided by the GameEngine.
+
+        Args:
+            guess (str): The word that was just guessed.
+            guess_results (list[Letter]): A list of Letter objects representing the
+                                         feedback for the guess.
+        """
+        # Remove the guessed word from the list to prevent repeats.
+        if guess in self.word_list:
+            self.word_list.remove(guess)
         
+        # Create a new, empty list to hold only the words that pass all the rules.
         new_possible_words = []
 
+        # Check every remaining word against the feedback from the last guess.        
         for word in self.word_list:
             is_still_possible = True
 
-            for i, letter_feedback in enumerate(guess_results):
-                letter_char = letter_feedback.letter
-                
-                if letter_feedback.is_in_correct_place():
-                    if word[i] != letter_char:
-                        is_still_possible = False
-                        break
-                elif letter_feedback.is_in_word():
-                    if letter_char not in word or word[i] == letter_char:
-                        is_still_possible = False
-                        break
-                else:
-                    if letter_char in word:
-                        is_still_possible = False
-                        break
+            # This inner loop checks the current 'word' against each letter's feedback.            
+            for i, feedback in enumerate(guess_results):
+                char_in_guess = feedback.letter
 
+                # Rule 1: Green letters (correct letter, correct place)
+                if feedback.is_in_correct_place():
+                    if word[i] != char_in_guess:
+                        is_still_possible = False
+                        break  # This word is invalid.
+                
+                # Rule 2: Yellow letters (correct letter, wrong place)
+                elif feedback.is_in_word():
+                    if char_in_guess not in word or word[i] == char_in_guess:
+                        is_still_possible = False
+                        break  # This word is invalid.
+                
+                # Rule 3: Grey letters (incorrect letter)
+                else:
+                    # A grey letter can be eliminated ONLY if it doesn't also appear
+                    # as a green or yellow in the SAME guess (e.g., guess "ARRAY" for target "ALARM").
+                    is_positive_somewhere = any(
+                        char_in_guess == f.letter and f.is_in_word() for f in guess_results
+                    )
+                    if not is_positive_somewhere and char_in_guess in word:
+                        is_still_possible = False
+                        break  # This word is invalid.
+            
+            # If the word survived all the checks, add it to our new list.
             if is_still_possible:
                 new_possible_words.append(word)
         
+        # Finally, replace the old word list with the newly filtered, smaller list.
         self.word_list = new_possible_words
-
-# raise NotImplementedError()
-
-#CELL
-
-# Tests for Bot class.
-
-# Check if the Bot class exists
-assert "Bot" in dir(), "The Bot class does not exist, did you define it?"
-
-# CELL
-
-import random
 
 
 class GameEngine:
@@ -259,21 +305,34 @@ class GameEngine:
             f"Thanks for playing! You didn't find the target word in the number of guesses allowed."
         )
         return
-    
-# CELL
 
+
+
+# =====================================================================
+# SCRIPT EXECUTION
+# =====================================================================
 if __name__ == "__main__":
-    # Chris's favorite words
+    # -----------------------------------------------------------------
+    # GAME CONTENT AND SETUP
+    # -----------------------------------------------------------------
+    # Define a small list of words for testing.
     favorite_words = ["doggy", "drive", "daddy", "field", "state"]
 
-    # Write this to a temporary file
+    # Write this list to a temporary file for the bot to read.
     words_file = "temp_file.txt"
     with open(words_file, "w") as file:
         file.writelines("\n".join(favorite_words))
 
-    # Initialize the student Bot
-    bot = Bot(words_file)
+    # --- NEW: Select a random target word ---
+    # Choose one word from the list to be the secret target for this game.
+    target = random.choice(favorite_words)
 
-    # Create a new GameEngine and play a game with the Bot, in this
-    # test run I chose to set the target_word to "doggy"
-    GameEngine().play(bot, word_list_file=words_file, target_word="doggy")
+    # -----------------------------------------------------------------
+    # INITIALIZE AND START THE GAME
+    # -----------------------------------------------------------------
+    # Initialize the Bot and the GameEngine.
+    bot = Bot(words_file)
+    game = GameEngine()
+
+    # Start the game, passing the bot and the randomly chosen target word.
+    game.play(bot, word_list_file=words_file, target_word=target)
