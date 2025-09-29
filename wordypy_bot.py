@@ -315,8 +315,19 @@ if __name__ == "__main__":
     # -----------------------------------------------------------------
     # GAME CONTENT AND SETUP
     # -----------------------------------------------------------------
-    # Define a small list of words for testing.
-    favorite_words = ["doggy", "drive", "daddy", "field", "state"]
+    # A list of words for the game.
+    favorite_words = [
+        # Original words
+        "doggy", "drive", "daddy", "field", "state",
+        # 50 new words
+        "about", "above", "agent", "alarm", "alive", "alone", "anger", "apple",
+        "apply", "argue", "avoid", "aware", "basic", "beach", "begin", "black",
+        "blame", "blind", "block", "board", "brain", "bread", "break", "brief",
+        "bring", "brown", "build", "cable", "catch", "chain", "chair", "chart",
+        "check", "chief", "child", "claim", "class", "clean", "clear", "clock",
+        "close", "cloud", "coach", "coast", "could", "count", "court", "cover",
+        "craft", "cream", "crime"
+    ]
 
     # Write this list to a temporary file for the bot to read.
     words_file = "temp_file.txt"
